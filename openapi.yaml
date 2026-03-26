@@ -1,0 +1,153 @@
+openapi: 3.0.0
+info:
+  title: IoT API - Buzzer & Sensors
+  version: 2.2.0
+  description: API IoT con WebSocket para monitoreo en tiempo real de temperatura, humedad y mapa térmico.
+
+servers:
+  - url: http://192.168.1.6:9090
+    description: Servidor local
+
+tags:
+  - name: Buzzer
+  - name: Temperature
+  - name: DHT11
+  - name: Monitoring
+
+paths:
+
+  # =========================
+  # BUZZER
+  # =========================
+  /buzzer/on:
+    post:
+      tags: [Buzzer]
+      summary: Encender buzzer
+      responses:
+        "200":
+          description: Buzzer encendido
+
+  /buzzer/off:
+    post:
+      tags: [Buzzer]
+      summary: Apagar buzzer
+      responses:
+        "200":
+          description: Buzzer apagado
+
+  /buzzer/status:
+    get:
+      tags: [Buzzer]
+      summary: Estado del buzzer
+      responses:
+        "200":
+          description: Estado actual
+          content:
+            application/json:
+              example:
+                state: true
+
+  # =========================
+  # TEMPERATURE
+  # =========================
+  /temperature:
+    post:
+      tags: [Temperature]
+      summary: Recibir temperatura en tiempo real
+      description: Recibe datos cada segundo y calcula promedio cada 10 minutos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              value: 30.5
+      responses:
+        "200":
+          description: OK
+
+    get:
+      tags: [Temperature]
+      summary: Obtener historial de temperatura
+      responses:
+        "200":
+          description: Lista de promedios
+          content:
+            application/json:
+              example:
+                - value_avg: 30.2
+                  value_min: 29.1
+                  value_max: 32.0
+                  created_at: "2026-03-25T10:00:00Z"
+
+  /temperature/live:
+    get:
+      tags: [Temperature]
+      summary: Temperatura en tiempo real
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                value: 30.2
+
+  # =========================
+  # DHT11
+  # =========================
+  /dht11:
+    post:
+      tags: [DHT11]
+      summary: Guardar datos del DHT11
+      description: Guarda datos históricos cada 10 minutos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              temperature: 25.5
+              humidity: 60
+      responses:
+        "200":
+          description: OK
+
+  /dht11/last:
+    get:
+      tags: [DHT11]
+      summary: Última lectura del DHT11
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                temperature: 25.5
+                humidity: 60
+                created_at: "2026-03-25T10:00:00Z"
+
+  # =========================
+  # MONITORING
+  # =========================
+  /monitoring/status:
+    get:
+      tags: [Monitoring]
+      summary: Estado del monitoreo
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                active: true
+
+  /monitoring/on:
+    post:
+      tags: [Monitoring]
+      summary: Activar monitoreo automático
+      responses:
+        "200":
+          description: Monitoreo activado
+
+  /monitoring/off:
+    post:
+      tags: [Monitoring]
+      summary: Desactivar monitoreo automático
+      responses:
+        "200":
+          description: Monitoreo desactivado
